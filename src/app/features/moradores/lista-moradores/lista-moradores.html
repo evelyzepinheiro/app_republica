@@ -1,0 +1,100 @@
+<!-- src/app/features/cadastro-morador/lista-moradores.html -->
+<div class="card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Lista de Moradores</h5>
+    <button
+      class="btn btn-outline-secondary btn-sm"
+      (click)="onRecarregar()"
+      [disabled]="carregando"
+    >
+      <span
+        *ngIf="carregando"
+        class="spinner-border spinner-border-sm me-1"
+      ></span>
+      {{ carregando ? "Carregando..." : "Atualizar" }}
+    </button>
+  </div>
+
+  <div class="card-body">
+    <!-- Loading -->
+    <div *ngIf="carregando && moradores.length === 0" class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+      <p class="mt-2">Carregando moradores...</p>
+    </div>
+
+    <!-- Lista vazia -->
+    <div *ngIf="!carregando && moradores.length === 0" class="text-center py-4">
+      <h6>Nenhum morador cadastrado</h6>
+      <p class="text-muted">
+        Use o formulário acima para cadastrar o primeiro morador.
+      </p>
+    </div>
+
+    <!-- Tabela de moradores -->
+    <div *ngIf="moradores.length > 0">
+      <div class="mb-3">
+        <span class="text-muted">
+          {{ moradores.length }} morador(es) encontrado(s)
+        </span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>CPF</th>
+              <th>Email</th>
+              <th>Celular</th>
+              <th>Data de Nascimento</th>
+              <th width="150">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let morador of moradores">
+              <td>{{ morador.id }}</td>
+              <td>
+                <strong>{{ morador.nome }}</strong>
+              </td>
+              <td>
+                {{ morador.cpf }}
+              </td>
+              <td>
+                {{ morador.email }}
+              </td>
+              <td>
+                {{ morador.celular }}
+              </td>
+              <td>
+                {{ morador.data_nascimento }}
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <button
+                    class="btn btn-outline-primary"
+                    (click)="onEditarMorador(morador)"
+                    title="Editar morador"
+                    [disabled]="carregando"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    class="btn btn-outline-danger"
+                    (click)="onExcluirMorador(morador)"
+                    title="Excluir morador"
+                    [disabled]="carregando"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

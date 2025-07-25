@@ -1,0 +1,81 @@
+<div
+  class="container-fluid vh-100 d-flex align-items-center justify-content-center bg-light"
+>
+  <div class="row w-100 justify-content-center">
+    <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+      <div class="card shadow">
+        <div class="card-body p-4">
+          <div class="text-center mb-4">
+            <h2 class="card-title fw-bold text-primary">República App</h2>
+            <p class="text-muted">Entre com suas credenciais</p>
+          </div>
+
+          <!-- Alerta de erro -->
+          <div
+            *ngIf="errorMessage"
+            class="alert alert-danger alert-dismissible fade show"
+            role="alert"
+          >
+            {{ errorMessage }}
+            <button
+              type="button"
+              class="btn-close"
+              (click)="errorMessage = ''"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+            <div class="mb-3">
+              <label for="username" class="form-label">Usuário</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                [(ngModel)]="username"
+                (input)="onInputChange()"
+                class="form-control form-control-lg"
+                [class.is-invalid]="errorMessage"
+                placeholder="Digite seu usuário"
+                [disabled]="isLoading"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Senha</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                [(ngModel)]="password"
+                (input)="onInputChange()"
+                class="form-control form-control-lg"
+                [class.is-invalid]="errorMessage"
+                placeholder="Digite sua senha"
+                [disabled]="isLoading"
+                required
+              />
+            </div>
+
+            <div class="d-grid">
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg"
+                [disabled]="isLoading || !username || !password"
+              >
+                <span
+                  *ngIf="isLoading"
+                  class="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                {{ isLoading ? "Entrando..." : "Entrar" }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

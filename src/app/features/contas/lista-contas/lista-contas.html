@@ -1,0 +1,155 @@
+<!-- src/app/features/contas/lista-contas/lista-contas.html -->
+<div class="card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Lista de Contas</h5>
+    <button
+      class="btn btn-outline-secondary btn-sm"
+      (click)="onRecarregar()"
+      [disabled]="carregando"
+    >
+      <span
+        *ngIf="carregando"
+        class="spinner-border spinner-border-sm me-1"
+      ></span>
+      {{ carregando ? "Carregando..." : "Atualizar" }}
+    </button>
+  </div>
+
+  <div class="card-body">
+    <!-- Loading -->
+    <div *ngIf="carregando && contas.length === 0" class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+      <p class="mt-2">Carregando contas...</p>
+    </div>
+
+    <!-- Lista vazia -->
+    <div *ngIf="!carregando && contas.length === 0" class="text-center py-4">
+      <h6>Nenhuma conta cadastrada</h6>
+      <p class="text-muted">
+        Use o formulário acima para cadastrar a primeira conta.
+      </p>
+    </div>
+
+    <!-- Tabela de contas -->
+    <div *ngIf="contas.length > 0">
+      <div class="mb-3">
+        <span class="text-muted">
+          {{ contas.length }} conta(s) encontrada(s)
+        </span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Tipo</th>
+              <th>Responsável</th>
+              <th>Valor</th>
+              <th>Vencimento</th>
+              <th>Situação</th>
+              <th width="150">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let conta of contas">
+              <td>{{ conta.id }}</td>
+              <td>
+                <strong>{{ conta.tipoConta }}</strong>
+              </td>
+              <td>{{ getMoradorNome(conta.moradorResponsavelId) }}</td>
+              <td>
+                <strong>{{
+                  conta.valor | currency : "BRL" : "symbol" : "1.2-2"
+                }}</strong>
+              </td>
+              <td>{{ conta.dataVencimento | date : "dd/MM/yyyy" }}</td>
+              <td>
+                <span
+                  class="badge"
+                  [class]="getStatusBadgeClass(conta.situacao)"
+                >
+                  {{ conta.situacao }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <button
+                    class="btn btn-outline-primary"
+                    (click)="onEditarConta(conta)"
+                    title="Editar conta"
+                    [disabled]="carregando"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    class="btn btn-outline-danger"
+                    (click)="onExcluirConta(conta)"
+                    title="Excluir conta"
+                    [disabled]="carregando"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Seção de Rateios (Expandível) -->
+      <div *ngFor="let conta of contas" class="mt-4">
+        <div class="card">
+          <div
+            class="card-header"
+            style="cursor: pointer"
+            data-bs-toggle="collapse"
+            [attr.data-bs-target]="'#rateios-' + conta.id"
+          >
+            <h6 class="mb-0">
+              Rateios - {{ conta.tipoConta }}
+              <small class="text-muted">
+                ({{ conta.valor | currency : "BRL" : "symbol" : "1.2-2" }})
+              </small>
+            </h6>
+          </div>
+          <div class="collapse" [id]="'rateios-' + conta.id">
+            <div class="card-body" *ngIf="rateiosDetalhes[conta.id!]">
+              <div class="table-responsive">
+                <table class="table table-sm table-striped">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Morador</th>
+                      <th>Valor</th>
+                      <th>Situação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let rateio of rateiosDetalhes[conta.id!]">
+                      <td>{{ getMoradorNome(rateio.moradorId) }}</td>
+                      <td>
+                        {{
+                          rateio.valor | currency : "BRL" : "symbol" : "1.2-2"
+                        }}
+                      </td>
+                      <td>
+                        <span
+                          class="badge"
+                          [class]="getStatusBadgeClass(rateio.situacao)"
+                        >
+                          {{ rateio.situacao }}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

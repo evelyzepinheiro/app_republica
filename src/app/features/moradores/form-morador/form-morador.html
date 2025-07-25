@@ -1,0 +1,139 @@
+<!-- src/app/features/moradores/form-morador/form-morador.html -->
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">{{ titulo }}</h5>
+  </div>
+
+  <div class="card-body">
+    <!-- Mensagem de Feedback -->
+    <div
+      *ngIf="mensagem"
+      class="alert alert-dismissible fade show mb-3"
+      [class.alert-success]="tipoMensagem === 'success'"
+      [class.alert-danger]="tipoMensagem === 'error'"
+    >
+      {{ mensagem }}
+      <button type="button" class="btn-close" (click)="mensagem = ''"></button>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #moradorForm="ngForm">
+      <!-- Primeira linha: Nome e E-mail -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="nome" class="form-label">Nome *</label>
+          <input
+            type="text"
+            id="nome"
+            name="nome"
+            [(ngModel)]="morador.nome"
+            class="form-control"
+            placeholder="Nome completo"
+            [disabled]="isLoading"
+            required
+          />
+        </div>
+        <div class="col-md-6">
+          <label for="email" class="form-label">E-mail *</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            [(ngModel)]="morador.email"
+            class="form-control"
+            placeholder="email@exemplo.com"
+            [disabled]="isLoading"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Segunda linha: CPF, Data nascimento e Celular -->
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <label for="cpf" class="form-label">CPF *</label>
+          <input
+            type="text"
+            id="cpf"
+            name="cpf"
+            [(ngModel)]="morador.cpf"
+            class="form-control"
+            placeholder="000.000.000-00"
+            maxlength="14"
+            [disabled]="isLoading"
+            required
+          />
+        </div>
+        <div class="col-md-4">
+          <label for="data_nascimento" class="form-label"
+            >Data nascimento *</label
+          >
+          <input
+            type="date"
+            id="data_nascimento"
+            name="data_nascimento"
+            [(ngModel)]="morador.data_nascimento"
+            class="form-control"
+            [disabled]="isLoading"
+            required
+          />
+        </div>
+        <div class="col-md-4">
+          <label for="celular" class="form-label">Celular *</label>
+          <input
+            type="tel"
+            id="celular"
+            name="celular"
+            [(ngModel)]="morador.celular"
+            (input)="formatarCelular($event)"
+            class="form-control"
+            placeholder="(00) 00000-0000"
+            maxlength="15"
+            [disabled]="isLoading"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="row mb-3" *ngIf="!isEdicao">
+        <div class="col-12">
+          <small class="text-muted">* Campos obrigatórios</small>
+        </div>
+      </div>
+
+      <!-- Botões de ação -->
+      <div class="d-flex justify-content-between">
+        <button
+          *ngIf="isEdicao"
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="cancelar()"
+          [disabled]="isLoading"
+        >
+          Cancelar
+        </button>
+
+        <button
+          *ngIf="!isEdicao"
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="cancelar()"
+          [disabled]="isLoading"
+        >
+          Limpar Formulário
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading || !moradorForm.form.valid"
+        >
+          <span
+            *ngIf="isLoading"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          {{ isLoading ? "Salvando..." : isEdicao ? "Atualizar" : "Cadastrar" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,38 @@
+<app-navbar></app-navbar>
+
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <!-- Mensagem Geral -->
+      <div
+        *ngIf="mensagemGeral"
+        class="alert alert-dismissible fade show mb-3"
+        [class.alert-success]="tipoMensagemGeral === 'success'"
+        [class.alert-danger]="tipoMensagemGeral === 'error'"
+      >
+        {{ mensagemGeral }}
+        <button
+          type="button"
+          class="btn-close"
+          (click)="mensagemGeral = ''"
+        ></button>
+      </div>
+
+      <!-- Formulário de Morador -->
+      <app-form-morador
+        [moradorParaEdicao]="moradorParaEdicao"
+        (moradorSalvo)="onMoradorSalvo($event)"
+        (cancelarEdicao)="onCancelarEdicao()"
+      ></app-form-morador>
+
+      <!-- Lista de Moradores -->
+      <app-lista-moradores
+        [moradores]="moradores"
+        [carregando]="carregandoMoradores"
+        (editarMorador)="onEditarMorador($event)"
+        (excluirMorador)="onExcluirMorador($event)"
+        (recarregarLista)="carregarMoradores()"
+      ></app-lista-moradores>
+    </div>
+  </div>
+</div>

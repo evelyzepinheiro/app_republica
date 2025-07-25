@@ -1,0 +1,299 @@
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">{{ titulo }}</h5>
+  </div>
+
+  <div class="card-body">
+    <!-- Mensagem de Feedback -->
+    <div
+      *ngIf="mensagem"
+      class="alert alert-dismissible fade show mb-3"
+      [class.alert-success]="tipoMensagem === 'success'"
+      [class.alert-danger]="tipoMensagem === 'error'"
+    >
+      {{ mensagem }}
+      <button type="button" class="btn-close" (click)="mensagem = ''"></button>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #contaForm="ngForm">
+      <!-- Primeira linha: Morador Responsável e Situação -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="morador_responsavel" class="form-label"
+            >Morador Responsável *</label
+          >
+          <select
+            id="morador_responsavel"
+            name="morador_responsavel"
+            [(ngModel)]="conta.moradorResponsavelId"
+            class="form-select"
+            [disabled]="isLoading"
+            required
+          >
+            <option value="0">Selecione um morador</option>
+            <option *ngFor="let morador of moradores" [value]="morador.id">
+              {{ morador.nome }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label for="situacao" class="form-label">Situação da conta *</label>
+          <select
+            id="situacao"
+            name="situacao"
+            [(ngModel)]="conta.situacao"
+            class="form-select"
+            [disabled]="isLoading"
+            required
+          >
+            <option
+              *ngFor="let situacao of SituacaoConta | keyvalue"
+              [value]="situacao.value"
+            >
+              {{ situacao.value }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Segunda linha: Data, Valor e Tipo -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="data_vencimento" class="form-label"
+            >Data Vencimento *</label
+          >
+          <input
+            type="date"
+            id="data_vencimento"
+            name="data_vencimento"
+            [(ngModel)]="conta.dataVencimento"
+            class="form-control"
+            [disabled]="isLoading"
+            required
+          />
+        </div>
+        <div class="col-md-4">
+          <label for="valor" class="form-label">Valor *</label>
+          <input
+            type="number"
+            id="valor"
+            name="valor"
+            [(ngModel)]="conta.valor"
+            class="form-control"
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+            [disabled]="isLoading"
+            required
+          />
+        </div>
+        <div class="col-md-4">
+          <label for="tipo" class="form-label">Tipo *</label>
+          <select
+            id="tipo"
+            name="tipo"
+            [(ngModel)]="conta.tipoConta"
+            class="form-select"
+            [disabled]="isLoading"
+            required
+          >
+            <option
+              *ngFor="let tipo of TipoConta | keyvalue"
+              [value]="tipo.value"
+            >
+              {{ tipo.value }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Observação -->
+      <div class="mb-4">
+        <label for="observacao" class="form-label">Observação</label>
+        <textarea
+          id="observacao"
+          name="observacao"
+          [(ngModel)]="conta.observacao"
+          class="form-control"
+          rows="3"
+          [disabled]="isLoading"
+        ></textarea>
+      </div>
+
+      <!-- Seção de Rateio -->
+      <div class="mb-4">
+        <h6>Rateio da Conta</h6>
+
+        <!-- Campos para adicionar rateio -->
+        <div class="row mb-3 align-items-end">
+          <div class="col-md-3">
+            <label for="morador_rateio" class="form-label">Morador</label>
+            <select
+              id="morador_rateio"
+              [(ngModel)]="novoRateio.moradorId"
+              name="morador_rateio"
+              class="form-select"
+              [disabled]="isLoading"
+            >
+              <option value="0">Selecione um morador</option>
+              <option *ngFor="let morador of moradores" [value]="morador.id">
+                {{ morador.nome }}
+              </option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="valor_rateio" class="form-label">Valor</label>
+            <input
+              type="number"
+              id="valor_rateio"
+              [(ngModel)]="novoRateio.valor"
+              name="valor_rateio"
+              class="form-control"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              [disabled]="isLoading"
+            />
+          </div>
+          <div class="col-md-3">
+            <label for="tipo_rateio" class="form-label">Situação</label>
+            <select
+              id="tipo_rateio"
+              [(ngModel)]="novoRateio.tipo"
+              name="tipo_rateio"
+              class="form-select"
+              [disabled]="isLoading"
+            >
+              <option value="Pago">Pago</option>
+              <option value="Em aberto">Em aberto</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              (click)="adicionarRateio()"
+              [disabled]="
+                isLoading || !novoRateio.moradorId || !novoRateio.valor
+              "
+            >
+              Adicionar
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabela de rateios -->
+        <div class="table-responsive" *ngIf="rateios.length > 0">
+          <table class="table table-bordered table-sm">
+            <thead class="table-light">
+              <tr>
+                <th>Morador</th>
+                <th>Valor</th>
+                <th>Situação</th>
+                <th width="80">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let rateio of rateios; let i = index">
+                <td>{{ getMoradorNome(rateio.moradorId) }}</td>
+                <td>
+                  {{ rateio.valor | currency : "BRL" : "symbol" : "1.2-2" }}
+                </td>
+                <td>{{ rateio.tipo }}</td>
+                <td class="text-center">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="removerRateio(i)"
+                    [disabled]="isLoading"
+                    title="Remover"
+                  >
+                    ×
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="table-info">
+                <th>Total</th>
+                <th>
+                  {{
+                    getTotalRateios() | currency : "BRL" : "symbol" : "1.2-2"
+                  }}
+                </th>
+                <th colspan="2"></th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Botão Dividir Igualmente -->
+        <div class="text-start mt-3">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="dividirIgualmente()"
+            [disabled]="isLoading || !conta.valor || moradores.length === 0"
+          >
+            Dividir igualmente
+          </button>
+        </div>
+      </div>
+
+      <!-- Mensagem de validação do total -->
+      <div
+        *ngIf="getTotalRateios() !== conta.valor && rateios.length > 0"
+        class="alert alert-warning"
+      >
+        <small>
+          <strong>Atenção:</strong> O total dos rateios ({{
+            getTotalRateios() | currency : "BRL" : "symbol" : "1.2-2"
+          }}) deve ser igual ao valor da conta ({{
+            conta.valor | currency : "BRL" : "symbol" : "1.2-2"
+          }}).
+        </small>
+      </div>
+
+      <div class="row mb-3" *ngIf="!isEdicao">
+        <div class="col-12">
+          <small class="text-muted">* Campos obrigatórios</small>
+        </div>
+      </div>
+
+      <!-- Botões de ação -->
+      <div class="d-flex justify-content-between">
+        <button
+          *ngIf="isEdicao"
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="cancelar()"
+          [disabled]="isLoading"
+        >
+          Cancelar
+        </button>
+
+        <button
+          *ngIf="!isEdicao"
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="cancelar()"
+          [disabled]="isLoading"
+        >
+          Limpar Formulário
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading || !contaForm.form.valid"
+        >
+          <span
+            *ngIf="isLoading"
+            class="spinner-border spinner-border-sm me-2"
+          ></span>
+          {{ isLoading ? "Salvando..." : isEdicao ? "Atualizar" : "Cadastrar" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
