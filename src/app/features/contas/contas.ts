@@ -6,6 +6,8 @@ import { FormConta } from './form-conta/form-conta';
 import { ListaContas } from './lista-contas/lista-contas';
 import { Conta } from '../../models/models';
 import { Navbar } from '../../shared/navbar/navbar';
+import { forkJoin } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-contas',
@@ -22,7 +24,6 @@ export class Contas implements OnInit {
   tipoMensagemGeral: 'success' | 'error' = 'success';
 
   constructor(
-    private router: Router,
     private contaService: ContaService
   ) { }
 
@@ -34,9 +35,21 @@ export class Contas implements OnInit {
     this.carregandoContas = true;
     this.mensagemGeral = '';
 
-    this.contaService.getAll().subscribe({
-      next: (contas) => {
-        this.contas = contas;
+    // Primeiro carregar todos os tipos de conta
+    forkJoin({
+      contas: this.contaService.getAll(),
+      tiposConta: this.contaService.getTiposConta()
+    }).subscribe({
+      next: ({ contas, tiposConta }) => {
+        // Mapear cada conta com seu tipo correspondente
+        this.contas = contas.map(conta => {
+          const tipoConta = tiposConta.find(tipo => tipo.id === conta.tipoContaId);
+          return {
+            ...conta,
+            tipoConta: tipoConta || { id: conta.tipoContaId, descricao: 'Tipo não encontrado' }
+          };
+        });
+
         this.carregandoContas = false;
       },
       error: (error) => {
@@ -97,14 +110,5 @@ export class Contas implements OnInit {
     setTimeout(() => {
       this.mensagemGeral = '';
     }, 5000);
-  }
-
-  limparDados() {
-    if (confirm('Tem certeza que deseja limpar todos os dados? Esta ação não pode ser desfeita.')) {
-      this.contaService.clearAllData();
-      this.carregarContas();
-      this.contaParaEdicao = null;
-      alert('Dados reinicializados!');
-    }
   }
 }

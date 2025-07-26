@@ -22,18 +22,11 @@ export class ListaContas implements OnInit {
   rateiosDetalhes: { [contaId: number]: Rateio[] } = {};
 
   constructor(
-    private contaService: ContaService,
     private moradorService: MoradorService
   ) { }
 
   ngOnInit() {
     this.carregarMoradores();
-  }
-
-  ngOnChanges() {
-    if (this.contas.length > 0) {
-      this.carregarRateios();
-    }
   }
 
   carregarMoradores() {
@@ -43,20 +36,6 @@ export class ListaContas implements OnInit {
       },
       error: (error) => {
         console.error('Erro ao carregar moradores:', error);
-      }
-    });
-  }
-
-  carregarRateios() {
-    this.contas.forEach(conta => {
-      if (conta.id) {
-        this.contaService.getRateiosByConta(conta.id).subscribe({
-          next: (rateios) => {
-            if (conta.id) {
-              this.rateiosDetalhes[conta.id] = rateios;
-            }
-          }
-        });
       }
     });
   }

@@ -97,25 +97,4 @@ export class CadastroMorador implements OnInit {
       this.mensagemGeral = '';
     }, 5000);
   }
-
-  verDadosLocalStorage() {
-    this.moradorService.getAll().subscribe({
-      next: (moradores) => {
-        console.log('Moradores no localStorage:', moradores);
-        alert(`${moradores.length} morador(es) cadastrado(s). Verifique o console para mais detalhes.`);
-      },
-      error: (error) => {
-        console.error('Erro ao listar moradores:', error);
-      }
-    });
-  }
-
-  limparDados() {
-    if (confirm('Tem certeza que deseja limpar todos os dados? Esta ação não pode ser desfeita.')) {
-      this.moradorService.clearAllData();
-      this.carregarMoradores();
-      this.moradorParaEdicao = null;
-      alert('Dados reinicializados!');
-    }
-  }
 }

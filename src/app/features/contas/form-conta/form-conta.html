@@ -4,17 +4,6 @@
   </div>
 
   <div class="card-body">
-    <!-- Mensagem de Feedback -->
-    <div
-      *ngIf="mensagem"
-      class="alert alert-dismissible fade show mb-3"
-      [class.alert-success]="tipoMensagem === 'success'"
-      [class.alert-danger]="tipoMensagem === 'error'"
-    >
-      {{ mensagem }}
-      <button type="button" class="btn-close" (click)="mensagem = ''"></button>
-    </div>
-
     <form (ngSubmit)="onSubmit()" #contaForm="ngForm">
       <!-- Primeira linha: Morador Responsável e Situação -->
       <div class="row mb-3">
@@ -92,16 +81,15 @@
           <select
             id="tipo"
             name="tipo"
-            [(ngModel)]="conta.tipoConta"
+            [(ngModel)]="conta.tipoContaId"
+            (ngModelChange)="onTipoContaChange()"
             class="form-select"
             [disabled]="isLoading"
             required
           >
-            <option
-              *ngFor="let tipo of TipoConta | keyvalue"
-              [value]="tipo.value"
-            >
-              {{ tipo.value }}
+            <option value="0" disabled>Selecione um tipo</option>
+            <option *ngFor="let tipo of tiposConta" [value]="tipo.id">
+              {{ tipo.descricao }}
             </option>
           </select>
         </div>
@@ -195,21 +183,134 @@
             </thead>
             <tbody>
               <tr *ngFor="let rateio of rateios; let i = index">
-                <td>{{ getMoradorNome(rateio.moradorId) }}</td>
+                <!-- Coluna do Morador -->
                 <td>
-                  {{ rateio.valor | currency : "BRL" : "symbol" : "1.2-2" }}
+                  <div *ngIf="rateioEditandoIndex !== i">
+                    {{ getMoradorNome(rateio.moradorId) }}
+                    <small *ngIf="rateio.id && isEdicao" class="text-muted"
+                      >(existente)</small
+                    >
+                    <small *ngIf="!rateio.id && isEdicao" class="text-success"
+                      >(novo)</small
+                    >
+                  </div>
+                  <div *ngIf="rateioEditandoIndex === i">
+                    <select
+                      [(ngModel)]="rateio.moradorId"
+                      name="editMorador{{ i }}"
+                      class="form-select form-select-sm"
+                      [disabled]="isLoading"
+                    >
+                      <option value="0">Selecione um morador</option>
+                      <option
+                        *ngFor="let morador of moradores"
+                        [value]="morador.id"
+                      >
+                        {{ morador.nome }}
+                      </option>
+                    </select>
+                    <small *ngIf="rateio.id && isEdicao" class="text-muted"
+                      >(existente)</small
+                    >
+                    <small *ngIf="!rateio.id && isEdicao" class="text-success"
+                      >(novo)</small
+                    >
+                  </div>
                 </td>
-                <td>{{ rateio.tipo }}</td>
+
+                <!-- Coluna do Valor -->
+                <td>
+                  <div *ngIf="rateioEditandoIndex !== i">
+                    {{ rateio.valor | currency : "BRL" : "symbol" : "1.2-2" }}
+                  </div>
+                  <div *ngIf="rateioEditandoIndex === i">
+                    <input
+                      type="number"
+                      [(ngModel)]="rateio.valor"
+                      name="editValor{{ i }}"
+                      class="form-control form-control-sm"
+                      step="0.01"
+                      min="0"
+                      [disabled]="isLoading"
+                    />
+                  </div>
+                </td>
+
+                <!-- Coluna da Situação -->
+                <td>
+                  <div *ngIf="rateioEditandoIndex !== i">
+                    <span
+                      class="badge"
+                      [class.bg-success]="rateio.tipo === 'Pago'"
+                      [class.bg-warning]="rateio.tipo === 'Em aberto'"
+                    >
+                      {{ rateio.tipo }}
+                    </span>
+                  </div>
+                  <div *ngIf="rateioEditandoIndex === i">
+                    <select
+                      [(ngModel)]="rateio.tipo"
+                      name="editTipo{{ i }}"
+                      class="form-select form-select-sm"
+                      [disabled]="isLoading"
+                    >
+                      <option value="Pago">Pago</option>
+                      <option value="Em aberto">Em aberto</option>
+                    </select>
+                  </div>
+                </td>
+
+                <!-- Coluna das Ações -->
                 <td class="text-center">
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-outline-danger"
-                    (click)="removerRateio(i)"
-                    [disabled]="isLoading"
-                    title="Remover"
+                  <!-- Botões quando NÃO está editando -->
+                  <div
+                    *ngIf="rateioEditandoIndex !== i"
+                    class="btn-group btn-group-sm"
                   >
-                    ×
-                  </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      (click)="editarRateio(i)"
+                      [disabled]="isLoading || rateioEditandoIndex !== null"
+                      title="Editar rateio"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger"
+                      (click)="removerRateio(i)"
+                      [disabled]="isLoading"
+                      title="Remover rateio"
+                    >
+                      ×
+                    </button>
+                  </div>
+
+                  <!-- Botões quando ESTÁ editando -->
+                  <div
+                    *ngIf="rateioEditandoIndex === i"
+                    class="btn-group btn-group-sm"
+                  >
+                    <button
+                      type="button"
+                      class="btn btn-success"
+                      (click)="salvarEdicaoRateio(i)"
+                      [disabled]="isLoading"
+                      title="Salvar alterações"
+                    >
+                      ✓
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      (click)="cancelarEdicaoRateio(i)"
+                      [disabled]="isLoading"
+                      title="Cancelar edição"
+                    >
+                      ✗
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -258,6 +359,21 @@
         <div class="col-12">
           <small class="text-muted">* Campos obrigatórios</small>
         </div>
+      </div>
+
+      <!-- Mensagem de Feedback - MOVIDA PARA PRÓXIMO DOS BOTÕES -->
+      <div
+        *ngIf="mensagem"
+        class="alert alert-dismissible fade show mb-3"
+        [class.alert-success]="tipoMensagem === 'success'"
+        [class.alert-danger]="tipoMensagem === 'error'"
+      >
+        {{ mensagem }}
+        <button
+          type="button"
+          class="btn-close"
+          (click)="mensagem = ''"
+        ></button>
       </div>
 
       <!-- Botões de ação -->
