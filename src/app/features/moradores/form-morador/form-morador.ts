@@ -113,9 +113,7 @@ export class FormMorador implements OnInit, OnChanges {
         this.exibirMensagem('Morador atualizado com sucesso!', 'success');
         this.moradorSalvo.emit(morador);
 
-        setTimeout(() => {
-          this.cancelarEdicao.emit();
-        }, 1500);
+        this.cancelarEdicao.emit();
         this.isLoading = false;
       },
       error: (error) => {
@@ -169,19 +167,6 @@ export class FormMorador implements OnInit, OnChanges {
       this.mensagem = '';
     }, 5000);
   }
-
-  // formatarCPF(event: Event) {
-  //   const input = event.target as HTMLInputElement;
-  //   let valor = input.value.replace(/\D/g, '');
-
-  //   if (valor.length <= 11) {
-  //     valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
-  //     valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
-  //     valor = valor.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-  //   }
-
-  //   this.morador.cpf = valor;
-  // }
 
   formatarCelular(event: Event) {
     const input = event.target as HTMLInputElement;

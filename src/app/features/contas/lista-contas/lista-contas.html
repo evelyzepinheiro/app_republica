@@ -57,7 +57,7 @@
             <tr *ngFor="let conta of contas">
               <td>{{ conta.id }}</td>
               <td>
-                <strong>{{ conta.tipoConta }}</strong>
+                <strong>{{ conta.tipoConta.descricao }}</strong>
               </td>
               <td>{{ getMoradorNome(conta.moradorResponsavelId) }}</td>
               <td>
@@ -97,58 +97,6 @@
             </tr>
           </tbody>
         </table>
-      </div>
-
-      <!-- Seção de Rateios (Expandível) -->
-      <div *ngFor="let conta of contas" class="mt-4">
-        <div class="card">
-          <div
-            class="card-header"
-            style="cursor: pointer"
-            data-bs-toggle="collapse"
-            [attr.data-bs-target]="'#rateios-' + conta.id"
-          >
-            <h6 class="mb-0">
-              Rateios - {{ conta.tipoConta }}
-              <small class="text-muted">
-                ({{ conta.valor | currency : "BRL" : "symbol" : "1.2-2" }})
-              </small>
-            </h6>
-          </div>
-          <div class="collapse" [id]="'rateios-' + conta.id">
-            <div class="card-body" *ngIf="rateiosDetalhes[conta.id!]">
-              <div class="table-responsive">
-                <table class="table table-sm table-striped">
-                  <thead class="table-light">
-                    <tr>
-                      <th>Morador</th>
-                      <th>Valor</th>
-                      <th>Situação</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let rateio of rateiosDetalhes[conta.id!]">
-                      <td>{{ getMoradorNome(rateio.moradorId) }}</td>
-                      <td>
-                        {{
-                          rateio.valor | currency : "BRL" : "symbol" : "1.2-2"
-                        }}
-                      </td>
-                      <td>
-                        <span
-                          class="badge"
-                          [class]="getStatusBadgeClass(rateio.situacao)"
-                        >
-                          {{ rateio.situacao }}
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>

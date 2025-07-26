@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { Login } from '../../features/login/login';
 
 @Component({
   selector: 'app-navbar',
@@ -15,8 +16,7 @@ export class Navbar {
 
   logout() {
     // Limpar dados de autenticação
-    localStorage.removeItem('userData');
-    sessionStorage.removeItem('userData');
+    Login.logout();
 
     // Redirecionar para login
     this.router.navigate(['/login']);

@@ -4,8 +4,10 @@ export interface Conta {
   valor: number;
   dataVencimento: string;
   tipoConta: TipoConta;
+  tipoContaId: number;
   situacao: SituacaoConta;
   observacao?: string;
+  rateios?: Rateio[];
 }
 
 export interface Rateio {
@@ -20,10 +22,9 @@ export interface CreateContaRequest {
   moradorResponsavelId: number;
   valor: number;
   dataVencimento: string;
-  tipoConta: TipoConta;
+  tipoContaId: number;
   observacao?: string;
   situacao: SituacaoConta;
-  rateios: CreateRateioRequest[];
 }
 
 export interface UpdateContaRequest extends CreateContaRequest {
@@ -32,26 +33,38 @@ export interface UpdateContaRequest extends CreateContaRequest {
 
 export interface CreateRateioRequest {
   moradorId: number;
+  idConta: number;
   valor: number;
+  situacao: SituacaoRateio;
 }
 
-export enum TipoConta {
-  ALUGUEL = 'Aluguel',
-  AGUA = 'Água',
-  LUZ = 'Luz',
-  GAS = 'Gás',
-  INTERNET = 'Internet',
-  TELEFONE = 'Telefone',
-  OUTROS = 'Outros'
+export interface UpdateRateioRequest extends CreateRateioRequest {
+  id: number;
 }
+
+export interface TipoConta {
+  id: number;
+  descricao: string;
+  observacao?: string;
+}
+
+// export enum TipoConta {
+//   ALUGUEL = 'Aluguel',
+//   AGUA = 'Água',
+//   LUZ = 'Luz',
+//   GAS = 'Gás',
+//   INTERNET = 'Internet',
+//   TELEFONE = 'Telefone',
+//   OUTROS = 'Outros'
+// }
 
 export enum SituacaoConta {
-  PAGO = 'Pago',
-  EM_ABERTO = 'Em aberto',
-  
+  QUITADA = 'QUITADA',
+  PENDENTE = 'PENDENTE',
+  CANCELADA = 'CANCELADA'
 }
 
 export enum SituacaoRateio {
-  PAGO = 'Pago',
-  EM_ABERTO = 'Em aberto'
+  PAGO = 'PAGO',
+  EM_ABERTO = 'EM_ABERTO'
 }

@@ -53,8 +53,6 @@ export class Login {
   }
 
   private handleLoginSuccess(user: any) {
-    console.log('Login realizado com sucesso!', user);
-
     // Salvar dados do usuário no localStorage (mock)
     const userData = {
       id: Math.random().toString(36).substr(2, 9),
@@ -76,7 +74,6 @@ export class Login {
 
   private handleLoginError() {
     this.errorMessage = 'Usuário ou senha incorretos. Tente novamente.';
-    console.log('Falha no login');
   }
 
   // Método para limpar mensagens de erro quando o usuário digita
